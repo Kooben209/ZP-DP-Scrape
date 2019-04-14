@@ -113,13 +113,28 @@ with requests.session() as s:
 							continue;
 
 						hashTagLocation = k.replace("MORPH_URL_","").replace("_"," ").title().replace(" ","")
+
 						location = k.replace("MORPH_URL_","").replace("_"," ").title()
+
 						propLink=domain+advert.find("a", {"class" : "listing-results-price text-price"}).get('href')
 						propId=re.search('\d+',propLink.split("?")[0])
 						if propId:
 							propId=propId.group(0)
 						title = advert.find("h2", {"class" : "listing-results-attr"}).text
 						address = advert.find("a", {"class" : "listing-results-address"}).text
+						addressLastParts = address.split(',')[-1].strip().split(' ')
+						if len(addressLastParts) > 2:
+							if re.search(r'\d', addressLastParts[-1]):
+								 addressLastPart = ' '.join(addressLastParts[:-1])
+							else:
+								addressLastPart = ' '.join(addressLastParts)
+						else:
+							addressLastPart = addressLastParts[0]
+
+						if location.lower() == 'uk':
+							location = addressLastPart.title()
+							hashTagLocation = addressLastPart.replace("_"," ").title().replace(" ","")
+
 						price = parseAskingPrice(advert.find("a", {"class" : "listing-results-price text-price"}).text.strip())
 						displayPrice = advert.find("a", {"class" : "listing-results-price text-price"})
 						unwanted = displayPrice.find('span')
